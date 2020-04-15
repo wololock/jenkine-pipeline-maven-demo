@@ -1,0 +1,24 @@
+= Jenkins Pipeline Maven build demo
+
+video::HaGeSq-SB9E[youtube]
+
+== Ex 1: Using Global Tools Configuration
+
+[source,groovy]
+----
+include::Jenkinsfile_01[]
+----
+
+== Ex 2: Using `docker` agent and official Maven docker image
+
+[source,groovy]
+----
+include::Jenkinsfile_02[]
+----
+
+== Ex 2: Using `dockerfile` agent and Maven docker image build from the official image
+
+[source,groovy]
+----
+include::Jenkinsfile_03[]
+----
