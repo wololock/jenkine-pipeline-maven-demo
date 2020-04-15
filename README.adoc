@@ -1,24 +1,104 @@
 = Jenkins Pipeline Maven build demo
 
-video::HaGeSq-SB9E[youtube]
+[link=https://www.youtube.com/watch?v=HaGeSq-SB9E]
+image::https://img.youtube.com/vi/HaGeSq-SB9E/0.jpg[Sunset,300,200]
 
 == Ex 1: Using Global Tools Configuration
 
 [source,groovy]
 ----
-include::Jenkinsfile_01[]
+#!groovy
+
+pipeline {
+    agent any
+
+    tools {
+        maven "3.6.0" // You need to add a maven with name "3.6.0" in the Global Tools Configuration page
+    }
+
+    stages {
+        stage("Build") {
+            steps {
+                sh "mvn -version"
+                sh "mvn clean install"
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
 ----
 
 == Ex 2: Using `docker` agent and official Maven docker image
 
 [source,groovy]
 ----
-include::Jenkinsfile_02[]
+#!groovy
+
+pipeline {
+    environment {
+        JAVA_TOOL_OPTIONS = "-Duser.home=/var/maven"
+    }
+    agent {
+        docker {
+            image "maven:3.6.0-jdk-13"
+            label "docker"
+            args "-v /tmp/maven:/var/maven/.m2 -e MAVEN_CONFIG=/var/maven/.m2"
+        }
+    }
+
+    stages {
+        stage("Build") {
+            steps {
+                sh "mvn -version"
+                sh "mvn clean install"
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
 ----
 
 == Ex 2: Using `dockerfile` agent and Maven docker image build from the official image
 
 [source,groovy]
 ----
-include::Jenkinsfile_03[]
+#!groovy
+
+pipeline {
+    environment {
+        JAVA_TOOL_OPTIONS = "-Duser.home=/home/jenkins"
+    }
+    agent {
+        dockerfile {
+            label "docker"
+            args "-v /tmp/maven:/home/jenkins/.m2 -e MAVEN_CONFIG=/home/jenkins/.m2"
+        }
+    }
+
+    stages {
+        stage("Build") {
+            steps {
+                sh "ssh -V"
+                sh "mvn -version"
+                sh "mvn clean install"
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
 ----
